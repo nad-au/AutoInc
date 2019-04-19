@@ -10,7 +10,6 @@ namespace AutoInc.Neo4j.Tests
     public abstract class TestFixtureBase
     {
         protected IDriver driver;
-        protected Neo4jOptions options;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -25,10 +24,7 @@ namespace AutoInc.Neo4j.Tests
                 AuthTokens.Basic(neo4JConfiguration.Neo4jUsername, neo4JConfiguration.Neo4jPassword),
                 new Config { MaxTransactionRetryTime = TimeSpan.FromSeconds(15) });
 
-            options = new Neo4jOptions
-            {
-                LabelName = $"p{Guid.NewGuid():N}"
-            };
+            Neo4jOptions.LabelName = $"p{Guid.NewGuid():N}";
         }
 
         [TearDown]
@@ -37,12 +33,12 @@ namespace AutoInc.Neo4j.Tests
             using (var session = driver.Session(AccessMode.Write))
             {
                 await session.RunAsync(
-                    $"MATCH (id:{options.LabelName}) DELETE id");
+                    $"MATCH (id:{Neo4jOptions.LabelName}) DELETE id");
 
                 try
                 {
                     await session.RunAsync(
-                        $"DROP CONSTRAINT ON (u:{options.LabelName}) ASSERT u.Scope IS UNIQUE");
+                        $"DROP CONSTRAINT ON (u:{Neo4jOptions.LabelName}) ASSERT u.Scope IS UNIQUE");
                 }
                 // ReSharper disable once EmptyGeneralCatchClause
                 catch { }

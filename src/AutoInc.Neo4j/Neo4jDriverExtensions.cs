@@ -5,76 +5,61 @@ namespace AutoInc
 {
     public static class Neo4jDriverExtensions
     {
-        public static async Task InitialiseUniqueIds(this IDriver driver, Neo4jOptions options = null)
+        public static async Task InitialiseUniqueIds(this IDriver driver)
         {
             using (var session = driver.Session(AccessMode.Write))
             {
-                await session.InitialiseUniqueIds(options);
+                await session.InitialiseUniqueIds();
             }
         }
 
-        public static async Task InitialiseUniqueIds(this ISession session, Neo4jOptions options = null)
+        public static async Task InitialiseUniqueIds(this ISession session)
         {
             await session.WriteTransactionAsync(
-                async transaction => await transaction.InitialiseUniqueIds(options));
+                async transaction => await transaction.InitialiseUniqueIds());
         }
 
-        public static async Task InitialiseUniqueIds(this ITransaction transaction, Neo4jOptions options = null)
+        public static async Task InitialiseUniqueIds(this ITransaction transaction)
         {
-            var uniqueIdGenerator = options != null
-                ? new Neo4jUniqueIdGenerator(transaction, options)
-                : new Neo4jUniqueIdGenerator(transaction);
-
-            await uniqueIdGenerator.Initialise();
+            await new Neo4jUniqueIdGenerator(transaction).Initialise();
         }
 
-        public static async Task UpdateUniqueId(this IDriver driver, string scope, long value, Neo4jOptions options = null)
+        public static async Task UpdateUniqueId(this IDriver driver, string scope, long value)
         {
             using (var session = driver.Session(AccessMode.Write))
             {
-                await session.UpdateUniqueId(scope, value, options);
+                await session.UpdateUniqueId(scope, value);
             }
         }
 
-        public static async Task UpdateUniqueId(this ISession session, string scope, long value, Neo4jOptions options = null)
+        public static async Task UpdateUniqueId(this ISession session, string scope, long value)
         {
             await session.WriteTransactionAsync(
-                async transaction => await transaction.UpdateUniqueId(scope, value, options));
+                async transaction => await transaction.UpdateUniqueId(scope, value));
         }
 
-        public static async Task UpdateUniqueId(this ITransaction transaction, string scope, long value, Neo4jOptions options = null)
+        public static async Task UpdateUniqueId(this ITransaction transaction, string scope, long value)
         {
-            var uniqueIdGenerator = options != null
-                ? new Neo4jUniqueIdGenerator(transaction, options)
-                : new Neo4jUniqueIdGenerator(transaction);
-
-            await uniqueIdGenerator.Update(scope, value);
+            await new Neo4jUniqueIdGenerator(transaction).Update(scope, value);
         }
 
-        public static async Task<long> NextUniqueId(this IDriver driver, string scope, Neo4jOptions options = null)
+        public static async Task<long> NextUniqueId(this IDriver driver, string scope)
         {
             using (var session = driver.Session(AccessMode.Write))
             {
-                return await session.NextUniqueId(scope, options);
+                return await session.NextUniqueId(scope);
             }
         }
 
-        public static async Task<long> NextUniqueId(this ISession session, string scope, Neo4jOptions options = null)
+        public static async Task<long> NextUniqueId(this ISession session, string scope)
         {
             return await session.WriteTransactionAsync(
-                async transaction => await transaction.NextUniqueId(scope, options));
+                async transaction => await transaction.NextUniqueId(scope));
         }
 
-        public static async Task<long> NextUniqueId(
-            this ITransaction transaction,
-            string scope,
-            Neo4jOptions options = null)
+        public static async Task<long> NextUniqueId(this ITransaction transaction, string scope)
         {
-            var uniqueIdGenerator = options != null
-                ? new Neo4jUniqueIdGenerator(transaction, options)
-                : new Neo4jUniqueIdGenerator(transaction);
-
-            return await uniqueIdGenerator.NextId(scope);
+            return await new Neo4jUniqueIdGenerator(transaction).NextId(scope);
         }
     }
 }

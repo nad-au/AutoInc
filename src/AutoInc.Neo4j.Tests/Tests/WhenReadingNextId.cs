@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace AutoInc.Neo4j.Tests
 {
     [TestFixture]
+    [NonParallelizable]
     public class WhenReadingNextId : TestFixtureBase
     {
         [Test]
@@ -15,18 +16,10 @@ namespace AutoInc.Neo4j.Tests
             var scope = $"p{Guid.NewGuid():N}";
 
             // Act
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.WriteTransactionAsync(async tx =>
-                {
-                    var uniqueIdGenerator = new Neo4jUniqueIdGenerator(tx, options);
+            var initialId = await driver.NextUniqueId(scope);
 
-                    var initialId = await uniqueIdGenerator.NextId(scope);
-
-                    // Assert
-                    Assert.AreEqual(1, initialId);
-                });
-            }
+            // Assert
+            Assert.AreEqual(1, initialId);
         }
 
         [Test]
@@ -39,14 +32,12 @@ namespace AutoInc.Neo4j.Tests
             {
                 await session.WriteTransactionAsync(async tx =>
                 {
-                    var uniqueIdGenerator = new Neo4jUniqueIdGenerator(tx, options);
-
-                    var initialId = await uniqueIdGenerator.NextId(scope);
+                    var initialId = await tx.NextUniqueId(scope);
 
                     Assert.AreEqual(1, initialId);
 
                     // Act
-                    var nextId = await uniqueIdGenerator.NextId(scope);
+                    var nextId = await tx.NextUniqueId(scope);
 
                     // Assert
                     Assert.AreEqual(2, nextId);

@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 namespace AutoInc.Neo4j.Tests
 {
     [TestFixture]
+    [NonParallelizable]
     public class WhenConcurrentlyReadingNextId : TestFixtureBase
     {
         [Test]
         public async Task ItShouldReturnUniqueValues()
         {
             // Arrange
-            await driver.InitialiseUniqueIds(options);
+            await driver.InitialiseUniqueIds();
 
             const int maxConcurrency = 100;
 
@@ -20,7 +21,7 @@ namespace AutoInc.Neo4j.Tests
 
             // Act
             var tasks = Enumerable.Range(0, maxConcurrency)
-                .Select(i => driver.NextUniqueId(scope, options));
+                .Select(i => driver.NextUniqueId(scope));
             var allIds = (await Task.WhenAll(tasks)).ToList();
 
             // Assert

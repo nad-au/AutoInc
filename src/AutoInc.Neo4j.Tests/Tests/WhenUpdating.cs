@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace AutoInc.Neo4j.Tests
 {
     [TestFixture]
+    [NonParallelizable]
     public class WhenUpdating : TestFixtureBase
     {
         [Test]
@@ -16,13 +17,7 @@ namespace AutoInc.Neo4j.Tests
             var scope = $"p{Guid.NewGuid():N}";
 
             // Act
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.WriteTransactionAsync(async tx =>
-                {
-                    await new Neo4jUniqueIdGenerator(tx, options).Update(scope, 123);
-                });
-            }
+            await driver.UpdateUniqueId(scope, 123);
 
             // Assert
             using (var session = driver.Session())
@@ -33,23 +28,17 @@ namespace AutoInc.Neo4j.Tests
                 };
 
                 var cursor = await session.RunAsync($@"
-                    MATCH (n:{options.LabelName} {{Scope: $scope}})
+                    MATCH (n:{Neo4jOptions.LabelName} {{Scope: $scope}})
                     RETURN n.Value", parameters);
 
                 var record = await cursor.SingleAsync();
                 var value = record[0].As<long>();
 
                 Assert.AreEqual(123, value);
-            }
 
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.WriteTransactionAsync(async tx =>
-                {
-                    var nextId = await new Neo4jUniqueIdGenerator(tx, options).NextId(scope);
+                var nextId = await session.NextUniqueId(scope);
 
-                    Assert.AreEqual(124, nextId);
-                });
+                Assert.AreEqual(124, nextId);
             }
         }
 
@@ -63,17 +52,15 @@ namespace AutoInc.Neo4j.Tests
             {
                 await session.WriteTransactionAsync(async tx =>
                 {
-                    var uniqueIdGenerator = new Neo4jUniqueIdGenerator(tx, options);
-
-                    var initialId = await uniqueIdGenerator.NextId(scope);
+                    var initialId = await tx.NextUniqueId(scope);
 
                     Assert.AreEqual(1, initialId);
 
                     // Act
-                    await uniqueIdGenerator.Update(scope, 123);
+                    await tx.UpdateUniqueId(scope, 123);
 
                     // Assert
-                    var nextId = await uniqueIdGenerator.NextId(scope);
+                    var nextId = await tx.NextUniqueId(scope);
 
                     Assert.AreEqual(124, nextId);
                 });

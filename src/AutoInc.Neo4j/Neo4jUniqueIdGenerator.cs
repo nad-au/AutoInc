@@ -7,28 +7,23 @@ namespace AutoInc
     public class Neo4jUniqueIdGenerator : IUniqueIdGenerator, IUniqueIdValueStore
     {
         private readonly ITransaction transaction;
-        private readonly Neo4jOptions options;
 
         public Neo4jUniqueIdGenerator(ITransaction transaction)
-            : this(transaction, new Neo4jOptions()) { }
-
-        public Neo4jUniqueIdGenerator(ITransaction transaction, Neo4jOptions options)
         {
             this.transaction = transaction;
-            this.options = options;
         }
 
         public async Task Initialise()
         {
             await transaction.RunAsync(
-                $"CREATE CONSTRAINT ON (u:{options.LabelName}) ASSERT u.Scope IS UNIQUE");
+                $"CREATE CONSTRAINT ON (u:{Neo4jOptions.LabelName}) ASSERT u.Scope IS UNIQUE");
 
-            if (options.UseNeo4jEnterprise)
+            if (Neo4jOptions.UseNeo4jEnterprise)
             {
                 await transaction.RunAsync(
-                    $"CREATE CONSTRAINT ON (p:{options.LabelName}) ASSERT exists(p.Scope)");
+                    $"CREATE CONSTRAINT ON (p:{Neo4jOptions.LabelName}) ASSERT exists(p.Scope)");
                 await transaction.RunAsync(
-                    $"CREATE CONSTRAINT ON (p:{options.LabelName}) ASSERT exists(p.Value)");
+                    $"CREATE CONSTRAINT ON (p:{Neo4jOptions.LabelName}) ASSERT exists(p.Value)");
             }
         }
 
@@ -41,7 +36,7 @@ namespace AutoInc
             };
 
             await transaction.RunAsync($@"
-                MERGE (n:{options.LabelName} {{Scope: $scope}})
+                MERGE (n:{Neo4jOptions.LabelName} {{Scope: $scope}})
                 SET n.Value = $value", parameters);
         }
 
@@ -53,7 +48,7 @@ namespace AutoInc
             };
 
             var cursor = await transaction.RunAsync($@"
-                MERGE (n:{options.LabelName} {{Scope: $scope}})
+                MERGE (n:{Neo4jOptions.LabelName} {{Scope: $scope}})
                 SET n.Value = COALESCE(n.Value, 0) + 1
                 RETURN n.Value", parameters);
 

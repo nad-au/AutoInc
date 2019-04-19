@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace AutoInc.Neo4j.Tests
 {
     [TestFixture]
+    [NonParallelizable]
     public class WhenInitialising : TestFixtureBase
     {
         [Test]
@@ -22,18 +23,12 @@ namespace AutoInc.Neo4j.Tests
             };
 
             var createIdQuery = $@"
-                CREATE (id:{options.LabelName})
+                CREATE (id:{Neo4jOptions.LabelName})
                 SET id.Scope = $scope
                 SET id.Value = $value";
 
             // Act
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.WriteTransactionAsync(async tx =>
-                {
-                    await new Neo4jUniqueIdGenerator(tx, options).Initialise();
-                });
-            }
+            await driver.InitialiseUniqueIds();
 
             // Assert
             var exception = Assert.ThrowsAsync<ClientException>(async () =>
@@ -48,7 +43,7 @@ namespace AutoInc.Neo4j.Tests
                 }
             });
 
-            var expectedMessage = $"already exists with label `{options.LabelName}` and property `Scope` = '{scope}'";
+            var expectedMessage = $"already exists with label `{Neo4jOptions.LabelName}` and property `Scope` = '{scope}'";
             Assert.IsTrue(exception.Message.EndsWith(expectedMessage));
         }
     }
