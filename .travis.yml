@@ -10,8 +10,8 @@ env:
 
 before_install:
   # install Neo4j locally:
-  - apt-get install neo4j=1:3.5.4
-  - service neo4j start
+  - sudo apt-get install neo4j=1:3.5.4
+  - sudo service neo4j start
   
 install:
   - dotnet restore src/AutoInc.sln --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack
