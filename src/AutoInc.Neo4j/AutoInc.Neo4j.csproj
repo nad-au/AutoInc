@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>AutoInc</RootNamespace>
+    <Authors>Neil Dobson</Authors>
+    <Company />
+    <Product>AutoInc</Product>
+    <PackageProjectUrl>https://github.com/neildobson-au/AutoInc</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/neildobson-au/AutoInc</RepositoryUrl>
+    <PackageTags>Neo4j</PackageTags>
+    <Description>Generates sequence numbers used as Primary Keys to locate your records</Description>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
