@@ -1,0 +1,13 @@
+language: csharp
+mono: none
+dotnet: 2.2
+
+install:
+  - dotnet restore src/AutoInc.sln --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack
+
+services:
+  - neo4j
+  
+script:
+  - dotnet build src/AutoInc.sln
+  - dotnet test src/AutoInc.Neo4j.Tests/AutoInc.Neo4j.Tests.csproj
