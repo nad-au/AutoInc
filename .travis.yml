@@ -16,7 +16,7 @@ before_install:
   - neo4j-community-3.5.4/bin/neo4j start
   
 install:
-  - dotnet restore src/AutoInc.sln --source https://api.nuget.org/v3/index.json --source https://www.myget.org/F/servicestack
+  - dotnet restore src/AutoInc.sln --source https://api.nuget.org/v3/index.json
 
 script:
   - dotnet build src/AutoInc.sln
