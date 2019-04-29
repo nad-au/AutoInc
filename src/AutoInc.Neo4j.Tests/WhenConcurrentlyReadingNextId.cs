@@ -21,7 +21,7 @@ namespace AutoInc.Neo4j.Tests
 
             // Act
             var tasks = Enumerable.Range(0, maxConcurrency)
-                .Select(i => driver.NextUniqueId(scope));
+                .Select(i => driver.NextUniqueIdAsync(scope));
             var allIds = (await Task.WhenAll(tasks)).ToList();
 
             // Assert

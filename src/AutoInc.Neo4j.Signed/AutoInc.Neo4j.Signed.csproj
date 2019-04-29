@@ -13,6 +13,7 @@
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <AssemblyName>AutoInc.Neo4j</AssemblyName>
     <PackageId>AutoInc.Neo4j.Signed</PackageId>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

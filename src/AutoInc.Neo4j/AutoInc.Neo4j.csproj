@@ -11,6 +11,7 @@
     <PackageTags>Neo4j</PackageTags>
     <Description>Generates sequence numbers used as Primary Keys to locate your records</Description>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

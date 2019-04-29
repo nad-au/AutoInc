@@ -16,7 +16,7 @@ namespace AutoInc.Neo4j.Tests
             var scope = $"p{Guid.NewGuid():N}";
 
             // Act
-            var initialId = await driver.NextUniqueId(scope);
+            var initialId = await driver.NextUniqueIdAsync(scope);
 
             // Assert
             Assert.AreEqual(1, initialId);
@@ -32,12 +32,12 @@ namespace AutoInc.Neo4j.Tests
             {
                 await session.WriteTransactionAsync(async tx =>
                 {
-                    var initialId = await tx.NextUniqueId(scope);
+                    var initialId = await tx.NextUniqueIdAsync(scope);
 
                     Assert.AreEqual(1, initialId);
 
                     // Act
-                    var nextId = await tx.NextUniqueId(scope);
+                    var nextId = await tx.NextUniqueIdAsync(scope);
 
                     // Assert
                     Assert.AreEqual(2, nextId);

@@ -4,6 +4,12 @@ namespace AutoInc
 {
     public interface IUniqueIdGenerator
     {
-        Task<long> NextId(string scope);
+        Task Initialise();
+
+        long NextId(string scope);
+        Task<long> NextIdAsync(string scope);
+
+        void Update(string scope, long value);
+        Task UpdateAsync(string scope, long value);
     }
 }
