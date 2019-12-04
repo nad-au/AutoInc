@@ -11,11 +11,11 @@
     <PackageTags>Neo4j</PackageTags>
     <Description>Generates sequence numbers used as Primary Keys to locate your records</Description>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Neo4j.Driver" Version="1.7.0" />
+    <PackageReference Include="Neo4j.Driver" Version="1.7.2" />
   </ItemGroup>
 
   <ItemGroup>
