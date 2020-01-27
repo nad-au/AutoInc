@@ -1,5 +1,4 @@
-﻿using Neo4j.Driver.V1;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
 
@@ -16,7 +15,7 @@ namespace AutoInc.Neo4j.Tests
             var scope = $"p{Guid.NewGuid():N}";
 
             // Act
-            var initialId = await driver.NextUniqueIdAsync(scope);
+            var initialId = await Driver.NextUniqueIdAsync(scope).ConfigureAwait(false);
 
             // Assert
             Assert.AreEqual(1, initialId);
@@ -28,21 +27,21 @@ namespace AutoInc.Neo4j.Tests
             // Arrange
             var scope = $"p{Guid.NewGuid():N}";
 
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.WriteTransactionAsync(async tx =>
-                {
-                    var initialId = await tx.NextUniqueIdAsync(scope);
+            var session = Driver.AsyncSession();
+            var tx = await session.BeginTransactionAsync().ConfigureAwait(false);
 
-                    Assert.AreEqual(1, initialId);
+            var initialId = await tx.NextUniqueIdAsync(scope).ConfigureAwait(false);
 
-                    // Act
-                    var nextId = await tx.NextUniqueIdAsync(scope);
+            Assert.AreEqual(1, initialId);
 
-                    // Assert
-                    Assert.AreEqual(2, nextId);
-                });
-            }
+            // Act
+            var nextId = await tx.NextUniqueIdAsync(scope).ConfigureAwait(false);
+
+            // Assert
+            Assert.AreEqual(2, nextId);
+            
+            await tx.CommitAsync().ConfigureAwait(false);
+            await session.CloseAsync().ConfigureAwait(false);
         }
     }
 }

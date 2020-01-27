@@ -13,17 +13,21 @@
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <AssemblyName>AutoInc.Neo4j</AssemblyName>
     <PackageId>AutoInc.Neo4j.Signed</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\AutoInc.Neo4j\Neo4jDriverExtensions.cs" Link="Neo4jDriverExtensions.cs" />
+    <Compile Include="..\AutoInc.Neo4j\AsyncAutoIncExtensions.cs" Link="AsyncAutoIncExtensions.cs" />
+    <Compile Include="..\AutoInc.Neo4j\AsyncTransactionExtensions.cs" Link="AsyncTransactionExtensions.cs" />
+    <Compile Include="..\AutoInc.Neo4j\AutoIncExtensions.cs" Link="AutoIncExtensions.cs" />
     <Compile Include="..\AutoInc.Neo4j\Neo4jOptions.cs" Link="Neo4jOptions.cs" />
-    <Compile Include="..\AutoInc.Neo4j\Neo4jUniqueIdGenerator.cs" Link="Neo4jUniqueIdGenerator.cs" />
+    <Compile Include="..\AutoInc.Neo4j\Query.cs" Link="Query.cs" />
+    <Compile Include="..\AutoInc.Neo4j\TransactionExtensions.cs" Link="TransactionExtensions.cs" />
+    <Compile Include="..\AutoInc.Neo4j\UniqueIdGenerator.cs" Link="UniqueIdGenerator.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Neo4j.Driver.Signed" Version="1.7.2" />
+    <PackageReference Include="Neo4j.Driver.Simple.Signed" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>

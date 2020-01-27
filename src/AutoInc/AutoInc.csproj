@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/neildobson-au/AutoInc</RepositoryUrl>
     <Description>Generates sequence numbers used as Primary Keys to locate your records</Description>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
 </Project>

@@ -13,7 +13,7 @@ namespace AutoInc.Neo4j.Tests
         public async Task ItShouldReturnUniqueValues()
         {
             // Arrange
-            await driver.InitialiseUniqueIds();
+            await Driver.InitialiseUniqueIdsAsync().ConfigureAwait(false);
 
             const int maxConcurrency = 100;
 
@@ -21,8 +21,8 @@ namespace AutoInc.Neo4j.Tests
 
             // Act
             var tasks = Enumerable.Range(0, maxConcurrency)
-                .Select(i => driver.NextUniqueIdAsync(scope));
-            var allIds = (await Task.WhenAll(tasks)).ToList();
+                .Select(i => Driver.NextUniqueIdAsync(scope));
+            var allIds = (await Task.WhenAll(tasks).ConfigureAwait(false)).ToList();
 
             // Assert
             Assert.AreEqual(maxConcurrency, allIds.Count);

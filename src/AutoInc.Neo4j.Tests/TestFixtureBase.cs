@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Neo4j.Driver.V1;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using Neo4j.Driver;
 
 namespace AutoInc.Neo4j.Tests
 {
     [TestFixture]
     public abstract class TestFixtureBase
     {
-        protected IDriver driver;
+        protected IDriver Driver;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -20,9 +20,9 @@ namespace AutoInc.Neo4j.Tests
 
             var neo4JConfiguration = configuration.GetSection(typeof(Neo4jConfiguration).Name).Get<Neo4jConfiguration>();
 
-            driver = GraphDatabase.Driver(neo4JConfiguration.Neo4jBoltUri,
+            Driver = GraphDatabase.Driver(neo4JConfiguration.Neo4jBoltUri,
                 AuthTokens.Basic(neo4JConfiguration.Neo4jUsername, neo4JConfiguration.Neo4jPassword),
-                new Config { MaxTransactionRetryTime = TimeSpan.FromSeconds(15) });
+                builder => builder.WithMaxTransactionRetryTime(TimeSpan.FromSeconds(15)));
 
             Neo4jOptions.LabelName = $"p{Guid.NewGuid():N}";
         }
@@ -30,25 +30,28 @@ namespace AutoInc.Neo4j.Tests
         [TearDown]
         public async Task TearDown()
         {
-            using (var session = driver.Session(AccessMode.Write))
-            {
-                await session.RunAsync(
-                    $"MATCH (id:{Neo4jOptions.LabelName}) DELETE id");
+            var session = Driver.AsyncSession();
+            await session.RunAsync(
+                    $"MATCH (id:{Neo4jOptions.LabelName}) DELETE id").ConfigureAwait(false);
 
-                try
-                {
-                    await session.RunAsync(
-                        $"DROP CONSTRAINT ON (u:{Neo4jOptions.LabelName}) ASSERT u.Scope IS UNIQUE");
-                }
-                // ReSharper disable once EmptyGeneralCatchClause
-                catch { }
+            try
+            {
+                var tx = await session.BeginTransactionAsync().ConfigureAwait(false);
+                await tx.RunAsync(
+                    $"DROP CONSTRAINT ON (u:{Neo4jOptions.LabelName}) ASSERT u.Scope IS UNIQUE").ConfigureAwait(false);
+                await tx.CommitAsync().ConfigureAwait(false);
             }
+            catch (DatabaseException)
+            {
+            }
+
+            await session.CloseAsync().ConfigureAwait(false);
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            driver.Dispose();
+            Driver.Dispose();
         }
     }
 }

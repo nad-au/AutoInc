@@ -1,8 +1,8 @@
-﻿using Neo4j.Driver.V1;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Neo4j.Driver;
 
 namespace AutoInc.Neo4j.Tests
 {
@@ -28,19 +28,17 @@ namespace AutoInc.Neo4j.Tests
                 SET id.Value = $value";
 
             // Act
-            await driver.InitialiseUniqueIds();
+            await Driver.InitialiseUniqueIdsAsync().ConfigureAwait(false);
 
             // Assert
             var exception = Assert.ThrowsAsync<ClientException>(async () =>
             {
-                using (var session = driver.Session(AccessMode.Write))
-                {
-                    await session.WriteTransactionAsync(async tx =>
-                    {
-                        await tx.RunAsync(createIdQuery, parameters);
-                        await tx.RunAsync(createIdQuery, parameters);
-                    });
-                }
+                var session = Driver.AsyncSession();
+                var tx = await session.BeginTransactionAsync().ConfigureAwait(false);
+                await tx.RunAsync(createIdQuery, parameters).ConfigureAwait(false);
+                await tx.RunAsync(createIdQuery, parameters).ConfigureAwait(false);
+                await tx.CommitAsync().ConfigureAwait(false);
+                await session.CloseAsync().ConfigureAwait(false);
             });
 
             var expectedMessage = $"already exists with label `{Neo4jOptions.LabelName}` and property `Scope` = '{scope}'";
